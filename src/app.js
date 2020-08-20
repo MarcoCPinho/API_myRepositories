@@ -26,7 +26,7 @@ function validadeRepoId(request, response, next) {
   const { id } = request.params;
 
   if (!uuidValidate(id)) {
-    return response.status(400).json({ error: 'Invalid repositorie ID.' })
+    return response.status(400).json({ error: 'Invalid repository ID.' })
   }
 
   return next();
@@ -59,22 +59,24 @@ app.post("/repositories", (request, response) => {
 app.put("/repositories/:id", (request, response) => {
   const { id } = request.params;
   const { title, url, techs } = request.body;
-
+ 
   const repoIndex = repositories.findIndex(repository => repository.id === id);
 
   if (repoIndex < 0) {
-    return response.status(400).json({ error: 'Repositorie not found' })
-  } 
+    return response.status(400).json({ error: 'Repository not found' })
+  }
 
+  const { likes } = repositories[repoIndex];
+  
   const repository = {
+    id,
     title,
     url,
-    techs
+    techs,
+    likes
   };
 
-  repositories[repoIndex].title = title;
-  repositories[repoIndex].url = url;
-  repositories[repoIndex].techs = techs;
+  repositories[repoIndex] = repository;
 
   return response.json(repository);
 });
@@ -85,7 +87,7 @@ app.delete("/repositories/:id", (request, response) => {
   const repoIndex = repositories.findIndex(repository => repository.id === id);
 
   if (repoIndex < 0) {
-    return response.status(400).json({ error: 'Repositorie not found' })
+    return response.status(400).json({ error: 'Repository not found' })
   }
 
   repositories.splice(repoIndex, 1);
@@ -99,12 +101,12 @@ app.post("/repositories/:id/like", (request, response) => {
   const repoIndex = repositories.findIndex(repository => repository.id === id);
 
   if (repoIndex < 0) {
-    return response.status(400).json({ error: 'Repositorie not found' })
+    return response.status(400).json({ error: 'Repository not found' })
   }
 
-repositories[repoIndex].likes += 1;
+  repositories[repoIndex].likes += 1;
 
- return response.json(repositories[repoIndex])
+  return response.json(repositories[repoIndex])
 });
 
 module.exports = app;
